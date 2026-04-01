@@ -7,6 +7,7 @@
 #include "Usart1.h"
 #include "PWM.h"
 #include "Servo.h"
+#include "spider_con.h"
 
 int main(void)
 {	
@@ -16,36 +17,11 @@ int main(void)
 	BW_Init();
 	Servo_Init();
 	OLED_ShowString(0, 15, "=------usart1-----23=",6);
-		Delay_ms(1000);//竖直归位
-		Servo_SetAngle5(90);Servo_SetAngle1(90);
-		Servo_SetAngle6(90);Servo_SetAngle2(90);
-		Servo_SetAngle7(90);Servo_SetAngle3(90);
-		Servo_SetAngle8(90);Servo_SetAngle4(90);
-		Delay_ms(1000);//展开形态
-		Servo_SetAngle5(90);Servo_SetAngle1(45);
-		Servo_SetAngle6(90);Servo_SetAngle2(135);
-		Servo_SetAngle7(90);Servo_SetAngle3(135);
-		Servo_SetAngle8(90);Servo_SetAngle4(45);
-		Delay_ms(1000);//坐下
-		Servo_SetAngle5(0);Servo_SetAngle1(45);
-		Servo_SetAngle6(180);Servo_SetAngle2(135);
-		Servo_SetAngle7(180);Servo_SetAngle3(135);
-		Servo_SetAngle8(0);Servo_SetAngle4(45);
-		Delay_ms(1000);//展开形态
-		Servo_SetAngle5(90);Servo_SetAngle1(45);
-		Servo_SetAngle6(90);Servo_SetAngle2(135);
-		Servo_SetAngle7(90);Servo_SetAngle3(135);
-		Servo_SetAngle8(90);Servo_SetAngle4(45);
-		Delay_ms(1000);
+//	spider_check();
 	while(1)
 	{
-		Servo_SetAngle5(45);Servo_SetAngle1(20);Servo_SetAngle7(90);Servo_SetAngle3(90);
-		Servo_SetAngle6(90);Servo_SetAngle2(160);Servo_SetAngle8(45);Servo_SetAngle4(90);
-		Delay_ms(400);
-		Servo_SetAngle5(90);Servo_SetAngle1(90);Servo_SetAngle7(135);Servo_SetAngle3(160);
-		Servo_SetAngle6(135);Servo_SetAngle2(90);Servo_SetAngle8(90);Servo_SetAngle4(20);
-		Delay_ms(400);
-
+		spider_forward();
+//		spider_backward();
 		if(BW_GetRxFlag()==1)
 		{
 			//显示数据（16进制转10进制）			

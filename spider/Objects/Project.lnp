@@ -33,6 +33,7 @@
 ".\objects\usart1.o"
 ".\objects\pwm.o"
 ".\objects\servo.o"
+".\objects\spider_con.o"
 ".\objects\main.o"
 ".\objects\stm32f10x_it.o"
 --strict --scatter ".\Objects\Project.sct"

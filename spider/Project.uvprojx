@@ -620,6 +620,16 @@
               <FileType>5</FileType>
               <FilePath>.\Hardware\Servo.h</FilePath>
             </File>
+            <File>
+              <FileName>spider_con.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\spider_con.c</FilePath>
+            </File>
+            <File>
+              <FileName>spider_con.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Hardware\spider_con.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
