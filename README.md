@@ -1,93 +1,65 @@
 # 四足机器人前进步态研究
 
-## 1. 项目介绍
-本项目基于 STM32F103C8T6，使用 8 路舵机驱动实现四足机器人（蜘蛛形态）的基础步态控制，当前代码重点实现了前进与后退动作序列，并提供串口数据交互和 OLED 状态显示。
+## 项目介绍
+本项目主控已升级为 ESP32-S3，使用 8 路舵机驱动实现四足机器人（蜘蛛形态）的基础步态控制，当前代码重点实现了前进与后退动作序列，并提供TFT屏幕状态显示。项目使用 PlatformIO + Arduino 框架开发。
 
-项目位于 spider 目录，可直接在 Keil 中打开工程文件进行编译和烧录。
+项目位于 spideresp 目录，可直接在 vscode 中打开工程文件进行编译和烧录。
 
 <img src="assets/spider.jpg" width="600" height="400" alt="实际图像">
 
-核心特点：
-- 基于 TIM1 + TIM3 输出 8 路 PWM，驱动 8 个舵机。
-- 在 spider_con.c 中集中定义步态动作（前进、后退、自检）。
-- 支持蓝牙串口控制（帧头 0xA5，帧尾 0x5A，11 字节载荷）。
-- OLED 显示接收数据与连接状态，便于调试。
+## 项目特性
 
-## 2. 运行平台与环境
-- MCU：STM32F103C8T6
-- 开发环境：Keil uVision（MDK）
-- 代码目录：spider
-- 主要依赖：STM32F10x 标准外设库（已包含在工程中）
+- **主控**: ESP32-S3 (Arduino 框架)
+- **舵机控制**: 8 路 SG90 舵机，使用 ESP32 LEDC 硬件 PWM
+- **显示**: 支持 TFT 屏幕显示 (Adafruit ST7735/ST7789)
+- **步态控制**: 前进、后退、自检等基础步态
+- **供电**: 5V/2A+ 外置电源（关键！见下文说明）
 
-## 3. 使用方法
-### 3.1 打开工程
-1. 打开 Keil uVision。
-2. 选择 spider/Project.uvprojx。
-3. 确认目标芯片为 STM32F103C8T6（或与硬件一致的同系列型号）。
 
-### 3.2 编译与烧录
-1. 在 Keil 中执行 Rebuild。
-2. 连接下载器（如 ST-Link）并连接目标板。
-3. 配置好 Download 选项后执行 Download/Flash。
-4. 复位后观察舵机动作与 OLED 显示。
+## 硬件清单
 
-### 3.3 默认运行逻辑
-- 上电初始化 OLED、LED、按键、串口和舵机。
-- 主循环持续执行前进步态 spider_forward()。
-- 若收到串口数据帧：
-	- OLED 显示接收数据。
-	- 按协议回传数据并计算校验位。
-	- 可通过数据位控制测试 LED 开关。
+| 组件 | 数量 | 说明 |
+|---|---|---|
+| ESP32-S3 DevKit | 1 | 主控板 |
+| SG90 舵机 | 8 | 每足 2 个（胯部+肩部） |
+| 5V 稳压电源 | 1 | **必须 2A 以上**（推荐 3A） |
+| TFT 屏幕 | 1 | ST7735 或 ST7789 (可选) |
+| 杜邦线 | 若干 | 信号线、电源线 |
 
-## 4. 主要代码说明
-- 步态控制：spider/Hardware/spider_con.c
-	- spider_check()：上电自检动作
-	- spider_forward()：前进动作序列
-	- spider_backward()：后退动作序列
-- 舵机控制：spider/Hardware/Servo.c
-	- 角度映射为 PWM 脉宽：500us ~ 2500us
-- PWM 驱动：spider/Hardware/PWM.c
-	- TIM3（4 路）+ TIM1（4 路）共 8 路
-- 串口通信：spider/Hardware/Usart1.c
-	- USART2，9600 波特率，中断接收
-- 主程序入口：spider/User/main.c
+## 接线说明
 
-## 5. 项目结构
+### 舵机引脚分配
+
 ```
-.
-|-- README.md
-`-- spider/
-		|-- Project.uvprojx              # Keil 工程文件
-		|-- Project.uvoptx
-		|-- Hardware/                    # 硬件驱动与步态控制
-		|   |-- spider_con.c/h           # 四足步态控制核心
-		|   |-- Servo.c/h                # 舵机角度接口
-		|   |-- PWM.c/h                  # 8 路 PWM 输出
-		|   |-- Usart1.c/h               # 串口通信协议
-		|   |-- OLED.c/h                 # OLED 显示驱动
-		|   |-- OLED_Data.c/h            # OLED 图像/字模数据
-		|   |-- LED.c/h
-		|   `-- Key.c/h
-		|-- User/                        # 用户主程序
-		|   |-- main.c
-		|   |-- stm32f10x_it.c/h
-		|   `-- stm32f10x_conf.h
-		|-- System/                      # 系统级组件
-		|   `-- Delay.c/h
-		|-- Start/                       # 启动文件、CMSIS 系统文件
-		|   |-- startup_stm32f10x_*.s
-		|   |-- system_stm32f10x.c/h
-		|   `-- stm32f10x.h
-		|-- Library/                     # STM32 标准外设库源码
-		|   `-- stm32f10x_*.c/h
-		|-- Objects/                     # 编译输出文件
-		`-- Listings/                    # 列表与中间文件
+Servo[0] -> GPIO1   (左肩)
+Servo[1] -> GPIO2   (右肩)
+Servo[2] -> GPIO6   (左肩)
+Servo[3] -> GPIO7   (右肩)
+Servo[4] -> GPIO13  (左胯)
+Servo[5] -> GPIO14  (右胯)
+Servo[6] -> GPIO15  (左胯)
+Servo[7] -> GPIO17  (右胯)
 ```
 
-## 6. 扩展方向
-- 添加更多传感器和外设。
-- 步态研究完毕后将主控更换为ESP32。
-- 更换更好地现代开发框架
+**重要提示**: ESP32-S3 的 GPIO4/GPIO5 是 strapping 引脚，GPIO6/GPIO7 在部分模组上连接内部 Flash，请避免使用这些引脚！
+
+## 软件依赖
+
+| 库 | 版本 | 说明 |
+|---|---|---|
+| Adafruit ST7735 and ST7789 Library | ^1.10.4 | TFT 屏幕驱动 |
+| Adafruit GFX Library | ^1.11.9 | 图形库 |
+
+## 开发环境
+
+- **IDE**: PlatformIO (VSCode)
+- **框架**: Arduino
+- **目标板**: esp32-s3-devkitc-1
+
+## 目前问题
+多个舵机同时运动时可能出现供电不足导致的抖动或停转
+
+蓝牙通讯未完善
 
 ### 联系我们
 点击 [我的博客](https://mingchuangyinye.shop/personalpage) 与我们取得联系
